@@ -6,35 +6,21 @@ import cpca
 import json
 
 
-# 去除名字和逗号
-def sortname(information):
-
+def sortinfo(information):
+    info = {}
+    # 去除名字和逗号
     origin_list = information.split(',', 1)
-    name = origin_list[0]
-    return name, origin_list[1]
-
-
-# 提取出电话号码
-def sortphone(infomation):
-    phonenum = " "
-    for first_value in infomation:
+    info["姓名"] = origin_list[0]
+    firstcut_list = origin_list[1]
+    firstcut_list = jieba.lcut(firstcut_list)
+    # 提取出电话号码
+    for first_value in firstcut_list:
         phone = re.compile('^0\\d{2,3}\\d{7,8}$|^1[358]\\d{9}$|^147\\d{8}')
         phonematch = phone.match(first_value)
         if phonematch:
-            phonenum = phonematch.group()
-            del infomation[infomation.index(first_value)]
+            info["手机"] = phonematch.group()
+            del firstcut_list[firstcut_list.index(first_value)]
             break
-    return phonenum, infomation
-
-
-# 切分并填充地址
-def sortinfo(information):
-    name, firstcut_list = sortname(information)
-
-    firstcut_list = jieba.lcut(firstcut_list)
-
-    phone, firstcut_list = sortphone(firstcut_list)
-
     # 重新合成地址
     firstsorted_address = ''
     for addr in firstcut_list:
@@ -63,13 +49,8 @@ def sortinfo(information):
             else:
                 thridcut_list.insert(0, '')
 
-    address = newaddr + thridcut_list
-    temp = {
-            "姓名": name,
-            "手机": phone,
-            "地址": address
-        }
-    return json.dumps(temp, ensure_ascii=False,  indent=4)
+    info["地址"] = newaddr + thridcut_list
+    return info
 
 
 '''
@@ -83,4 +64,8 @@ for one_data in new_data:
 '''
 
 origin_data = input()
-print(sortinfo(origin_data))
+sorted_info = sortinfo(origin_data)
+# print(sorted_info)
+
+json = json.dumps(sorted_info, ensure_ascii=False,  sort_keys=True, indent=4, separators=(',', ':'))
+print(json)
