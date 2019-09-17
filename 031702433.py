@@ -4,11 +4,10 @@ import jieba
 import re
 import cpca
 import json
-import profile
 
 
 # 去除名字和逗号
-def sort_name(information):
+def sortname(information):
 
     origin_list = information.split(',', 1)
     name = origin_list[0]
@@ -16,7 +15,7 @@ def sort_name(information):
 
 
 # 提取出电话号码
-def sort_phone(infomation):
+def sortphone(infomation):
     phonenum = " "
     for first_value in infomation:
         phone = re.compile('^0\\d{2,3}\\d{7,8}$|^1[358]\\d{9}$|^147\\d{8}')
@@ -30,11 +29,11 @@ def sort_phone(infomation):
 
 # 切分并填充地址
 def sortinfo(information):
-    name, firstcut_list = sort_name(information)
+    name, firstcut_list = sortname(information)
 
     firstcut_list = jieba.lcut(firstcut_list)
 
-    phone, firstcut_list = sort_phone(firstcut_list)
+    phone, firstcut_list = sortphone(firstcut_list)
 
     # 重新合成地址
     firstsorted_address = ''
